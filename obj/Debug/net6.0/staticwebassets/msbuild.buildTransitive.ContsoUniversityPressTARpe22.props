@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\ContsoUniversityPressTARpe22.props" />
+</Project>
