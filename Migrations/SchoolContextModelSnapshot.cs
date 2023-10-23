@@ -30,7 +30,7 @@ namespace ContsoUniversityPressTARpe22.Migrations
                     b.Property<int>("Credits")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepartmentID")
+                    b.Property<int?>("DepartmentID")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -198,9 +198,7 @@ namespace ContsoUniversityPressTARpe22.Migrations
                 {
                     b.HasOne("ContsoUniversityPressTARpe22.Models.Department", "Department")
                         .WithMany("Courses")
-                        .HasForeignKey("DepartmentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DepartmentID");
 
                     b.Navigation("Department");
                 });

@@ -76,9 +76,9 @@ namespace ContsoUniversityPressTARpe22.Controllers
             }
             return View(student);
         }
+
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> EditPost(int? id)
         {
             if (id == null)

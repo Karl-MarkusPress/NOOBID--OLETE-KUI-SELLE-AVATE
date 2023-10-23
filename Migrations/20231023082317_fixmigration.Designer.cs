@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContsoUniversityPressTARpe22.Migrations
 {
     [DbContext(typeof(SchoolContext))]
-    [Migration("20231002084800_departmentfix")]
-    partial class departmentfix
+    [Migration("20231023082317_fixmigration")]
+    partial class fixmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,7 +32,7 @@ namespace ContsoUniversityPressTARpe22.Migrations
                     b.Property<int>("Credits")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepartmentID")
+                    b.Property<int?>("DepartmentID")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -200,9 +200,7 @@ namespace ContsoUniversityPressTARpe22.Migrations
                 {
                     b.HasOne("ContsoUniversityPressTARpe22.Models.Department", "Department")
                         .WithMany("Courses")
-                        .HasForeignKey("DepartmentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DepartmentID");
 
                     b.Navigation("Department");
                 });
