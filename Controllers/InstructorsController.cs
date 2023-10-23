@@ -16,7 +16,7 @@ namespace ContsoUniversityPressTARpe22.Controllers
         {
             var vm = new InstructorIndexData();
             vm.Instructors = await _context.Instructors
-                .Include(i => i.OfficeAssignments)
+                .Include(i => i.OfficeAssignment)
                 .Include(i => i.CourseAssignments)
                 .ThenInclude(i => i.Course)
                 .ThenInclude(i => i.Enrollments)
@@ -70,27 +70,46 @@ namespace ContsoUniversityPressTARpe22.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Instructor instructor, string selectedCourses)
+        //public async Task<IActionResult> Create(Instructor instructor, string[] selectedCourses)
+        //{
+        //    if (selectedCourses == null)
+        //    {
+        //        instructor.CourseAssignments = new List<CourseAssignment>();
+        //        foreach (var course in selectedCourses)
+        //        {
+        //            var courseToAdd = new CourseAssignment
+        //            {
+        //                InstructorID = instructor.ID,
+        //                CourseID = int.Parse(course)
+        //            };
+        //        }
+        //    }
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Add(instructor);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    PopulateAssignmentCourseData(instructor);
+        //    return View(instructor);
+        //}
+        public async Task<IActionResult> Create([Bind("HireDate,FirstMidName,LastName")] Instructor instructor)
         {
-            if (selectedCourses == null)
+            try
             {
-                instructor.CourseAssignments = new List<CourseAssignment>();
-                foreach (var course in selectedCourses)
+                if (ModelState.IsValid)
                 {
-                    var courseToAdd = new CourseAssignment
-                    {
-                        InstructorID = instructor.ID,
-                        CourseID = course
-                    };
+                    _context.Add(instructor);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
             }
-            if (ModelState.IsValid)
+            catch (DbUpdateException)
             {
-                _context.Add(instructor);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Unable to save changes" +
+                    "Try again, and if the problem persists" +
+                    "see your system administrator");
             }
-            PopulateAssignmentCourseData(instructor);
             return View(instructor);
         }
         [HttpGet]
@@ -101,7 +120,7 @@ namespace ContsoUniversityPressTARpe22.Controllers
                 return NotFound();
             }
             var instructor = await _context.Instructors
-                .Include(i => i.OfficeAssignments)
+                .Include(i => i.OfficeAssignment)
                 .Include(i => i.CourseAssignments)
                 .ThenInclude(i => i.Course)
                 .AsNoTracking()
@@ -117,26 +136,35 @@ namespace ContsoUniversityPressTARpe22.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Edit (int? id, string[] selectedCourses)
+        public async Task<IActionResult> Edit (int? id, string? officeLocation, string[] selectedCourses)
         {
+            ModelState.Remove("OfficeAssignments.Instructor");
             if (id == null)
             {
                 return NotFound();
             }
             var instructorToUpdate = await _context.Instructors
-                .Include(i => i.OfficeAssignments)
+                .Include(i => i.OfficeAssignment)
                 .Include(i => i.CourseAssignments)
                 .ThenInclude(i => i.Course)
                 .FirstOrDefaultAsync(s => s.ID == id);
-            if (await TryUpdateModelAsync<Instructor>(instructorToUpdate, "",
+
+            var tryUpdate = await TryUpdateModelAsync<Instructor>(instructorToUpdate, "",
                 i => i.FirstMidName,
                 i => i.LastName,
-                i => i.HireDate,
-                i => i.OfficeAssignments))
+                i => i.HireDate
+                );
+            if (instructorToUpdate.OfficeAssignment == null)
             {
-                if (string.IsNullOrWhiteSpace(instructorToUpdate.OfficeAssignments?.Location))
+                instructorToUpdate.OfficeAssignment = new();
+            }
+            instructorToUpdate.OfficeAssignment.Location = officeLocation;
+
+            if (tryUpdate)
+            {
+                if (string.IsNullOrWhiteSpace(instructorToUpdate.OfficeAssignment?.Location))
                 {
-                    instructorToUpdate.OfficeAssignments = null;
+                    instructorToUpdate.OfficeAssignment = null;
                 }
                 UpdateInstructorCourses(selectedCourses, instructorToUpdate);
                 try

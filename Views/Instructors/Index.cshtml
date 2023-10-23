@@ -36,12 +36,12 @@
                     @Html.DisplayFor(modelItem => item.FirstMidName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.HireDate)
+                    @item.HireDate.ToString("MM/dd/yyyy")
                 </td>
                 <td>
-                    @if (item.OfficeAssignments != null)
+                    @if (item.OfficeAssignment != null)
                     {
-                        @item.OfficeAssignments.Location
+                        @item.OfficeAssignment.Location
                     }
                 </td>
                 <td>

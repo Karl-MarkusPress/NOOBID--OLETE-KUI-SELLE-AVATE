@@ -13,6 +13,6 @@ namespace ContsoUniversityPressTARpe22.Models
         {
             get { return LastName + ", " + FirstMidName; }
         }
-        public ICollection<Enrollment> Enrollments { get; set; }
+        public ICollection<Enrollment>? Enrollments { get; set; }
     }
 }
